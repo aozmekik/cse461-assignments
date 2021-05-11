@@ -3,12 +3,15 @@
 
 float angle = -45;
 float xScale = 1, yScale = 1;
-float rotate = 2;
+float rotate = 0;
 
-void rotateFunc(int key, int x, int y)
+float xTranslate = 0, yTranslate = 0, zTranslate = -6;
+
+void specialKeyHandler(int key, int x, int y)
 {
     switch (key)
     {
+    // rotating
     case GLUT_KEY_RIGHT:
         angle += 1;
         if (angle > 360)
@@ -19,6 +22,8 @@ void rotateFunc(int key, int x, int y)
         if (angle < -360)
             angle = 0.0;
         break;
+
+    // scaling
     case GLUT_KEY_DOWN:
         if (xScale > 0.7)
         {
@@ -37,12 +42,37 @@ void rotateFunc(int key, int x, int y)
     glutPostRedisplay();
 }
 
+void normalKeyHandler(unsigned char key, int x, int y)
+{
+    switch (key)
+    {
+    case 'w':
+        zTranslate += 0.1;
+        break;
+    case 's':
+        zTranslate -= 0.1;
+        break;
+    case 'a':
+        xTranslate += 0.1;
+        break;
+    case 'd':
+        xTranslate -= 0.1;
+        break;
+    case 'q':
+        yTranslate += 0.1;
+        break;
+    case 'e':
+        yTranslate -= 0.1;
+    }
+    glutPostRedisplay();
+}
+
 // sekillere rotate ve scale transformu uygulamayı saglar.
 // her cizimden once tekrar cagrilmali.
 void registerTransform()
 {
-    glTranslatef(0, 0, -6);
-    glRotatef(angle, 0, 1, 0);
+    glTranslatef(xTranslate, yTranslate, zTranslate);
+    glRotatef(angle, 0, 1, rotate);
     glScalef(xScale, yScale, 1);
 }
 
@@ -66,7 +96,7 @@ void windows()
     glPushMatrix();
     registerTransform();
     glBegin(GL_QUADS);
-        glColor3f(0.6, 0.4, 0.2);
+    glColor3f(0.6, 0.4, 0.2);
 
     glVertex3f(2.01, 0.2, -0.3);
     glVertex3f(2.01, 0.2, 0.4);
@@ -281,7 +311,8 @@ int main(int argc, char **argv)
 
     glutDisplayFunc(display);
     glutReshapeFunc(reshape);
-    glutSpecialFunc(rotateFunc);
+    glutSpecialFunc(specialKeyHandler);
+    glutKeyboardFunc(normalKeyHandler);
     glutMainLoop();
     return 0;
 }
